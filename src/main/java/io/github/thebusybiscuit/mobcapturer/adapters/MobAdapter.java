@@ -13,10 +13,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-import io.github.thebusybiscuit.mobcapturer.utils.compatibility.AttributeX;
-
 import org.bukkit.ChatColor;
-import org.bukkit.NamespacedKey;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.attribute.AttributeModifier;
@@ -28,6 +25,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 import io.github.thebusybiscuit.mobcapturer.utils.JsonUtils;
+import io.github.thebusybiscuit.mobcapturer.utils.compatibility.AttributeX;
 import io.github.thebusybiscuit.slimefun4.utils.NumberUtils;
 
 /**

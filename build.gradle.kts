@@ -2,9 +2,9 @@ plugins {
     id("java")
     id("maven-publish")
     id("io.freefair.lombok") version "8.7.1"
-    id("com.gradleup.shadow") version "8.3.6"
-    id("de.eldoria.plugin-yml.bukkit") version "0.7.1"
-    id("xyz.jpenilla.run-paper") version "2.3.1"
+    id("com.gradleup.shadow") version "9.3.0"
+    id("de.eldoria.plugin-yml.bukkit") version "0.8.0"
+    id("xyz.jpenilla.run-paper") version "3.0.2"
 }
 
 repositories {
@@ -15,8 +15,8 @@ repositories {
 }
 
 dependencies {
-    compileOnly("io.papermc.paper:paper-api:1.21.7-R0.1-SNAPSHOT")
-    compileOnly("com.github.SlimefunGuguProject:Slimefun4:2025.1")
+    compileOnly("io.papermc.paper:paper-api:1.21.11-R0.1-SNAPSHOT")
+    compileOnly("com.github.slimefunguguproject:Slimefun4:5c188a3c0a")
     compileOnly("net.guizhanss:GuizhanLibPlugin:2.3.0")
     implementation("org.bstats:bstats-bukkit:3.0.3")
     implementation("com.google.code.findbugs:jsr305:3.0.2")
