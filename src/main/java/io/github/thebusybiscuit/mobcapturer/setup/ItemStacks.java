@@ -3,11 +3,12 @@ package io.github.thebusybiscuit.mobcapturer.setup;
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
 
+import com.google.common.base.Preconditions;
+
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack;
-import io.github.thebusybiscuit.slimefun4.libraries.commons.lang.Validate;
 
 import net.guizhanss.minecraft.guizhanlib.gugu.minecraft.helpers.entity.EntityTypeHelper;
 
@@ -40,8 +41,8 @@ public final class ItemStacks {
     @Nonnull
     @ParametersAreNonnullByDefault
     public static SlimefunItemStack buildMobEgg(EntityType type, String eggTexture) {
-        Validate.notNull(type, "Entity type cannot be null");
-        Validate.notNull(eggTexture, "Egg texture cannot be null");
+        Preconditions.checkArgument(type != null, "Entity type cannot be null");
+        Preconditions.checkArgument(eggTexture != null, "Egg texture cannot be null");
 
         return new SlimefunItemStack(
             "MOB_EGG_" + type,

@@ -71,7 +71,7 @@ tasks {
     runServer {
         downloadPlugins {
             // Slimefun
-            url("https://builds.guizhanss.com/api/download/SlimefunGuguProject/Slimefun4/master/218")
+            url("https://builds.guizhanss.com/api/download/SlimefunGuguProject/Slimefun4/master/latest")
             // GuizhanLibPlugin
             url("https://builds.guizhanss.com/api/download/ybw0014/GuizhanLibPlugin/master/latest")
             // SlimeHUD
@@ -80,6 +80,6 @@ tasks {
             url("https://builds.guizhanss.com/api/download/ybw0014/GuizhanCraft/master/latest")
         }
         jvmArgs("-Dcom.mojang.eula.agree=true")
-        minecraftVersion("1.21.6")
+        minecraftVersion("1.21.11")
     }
 }
