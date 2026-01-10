@@ -58,7 +58,7 @@ public class HorseAdapter extends AbstractHorseAdapter<Horse> {
     public void applyInventory(Horse entity, Map<String, ItemStack> inventory) {
         super.applyInventory(entity, inventory);
 
-        inventory.put("armor", entity.getInventory().getArmor());
+        entity.getInventory().setArmor(inventory.get("armor"));
     }
 
     @Nonnull
