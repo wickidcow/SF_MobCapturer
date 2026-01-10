@@ -17,7 +17,7 @@ repositories {
 dependencies {
     compileOnly("io.papermc.paper:paper-api:1.21.11-R0.1-SNAPSHOT")
     compileOnly("com.github.slimefunguguproject:Slimefun4:5c188a3c0a")
-    compileOnly("net.guizhanss:GuizhanLibPlugin:2.3.0")
+    compileOnly("net.guizhanss:GuizhanLibPlugin:2.5.0")
     implementation("org.bstats:bstats-bukkit:3.0.3")
     implementation("com.google.code.findbugs:jsr305:3.0.2")
 }
@@ -70,10 +70,11 @@ bukkit {
 tasks {
     runServer {
         downloadPlugins {
+            val t = System.currentTimeMillis()
             // Slimefun
-            url("https://builds.guizhanss.com/api/download/SlimefunGuguProject/Slimefun4/master/latest")
+            url("https://builds.guizhanss.com/api/download/SlimefunGuguProject/Slimefun4/master/latest?t=$t")
             // GuizhanLibPlugin
-            url("https://builds.guizhanss.com/api/download/ybw0014/GuizhanLibPlugin/master/latest")
+            url("https://builds.guizhanss.com/api/download/ybw0014/GuizhanLibPlugin/master/latest?t=$t")
             // SlimeHUD
             url("https://builds.guizhanss.com/api/download/SlimefunGuguProject/SlimeHUD/master/latest")
             // GuizhanCraft for testing convenient

@@ -1,8 +1,8 @@
 package io.github.thebusybiscuit.mobcapturer;
 
-import javax.annotation.Nonnull;
+import java.util.logging.Level;
 
-import net.guizhanss.minecraft.guizhanlib.updater.GuizhanUpdater;
+import javax.annotation.Nonnull;
 
 import org.bstats.bukkit.Metrics;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -14,7 +14,8 @@ import io.github.thebusybiscuit.mobcapturer.setup.Setup;
 import io.github.thebusybiscuit.slimefun4.api.SlimefunAddon;
 import io.github.thebusybiscuit.slimefun4.libraries.dough.config.Config;
 
-import java.util.logging.Level;
+import net.guizhanss.guizhanlib.minecraft.utils.MinecraftVersionUtil;
+import net.guizhanss.minecraft.guizhanlib.updater.GuizhanUpdater;
 
 /**
  * MobCapturer Slimefun addon
@@ -48,7 +49,16 @@ public class MobCapturer extends JavaPlugin implements SlimefunAddon {
 
         if (!getServer().getPluginManager().isPluginEnabled("GuizhanLibPlugin")) {
             getLogger().log(Level.SEVERE, "本插件需要 鬼斩前置库插件(GuizhanLibPlugin) 才能运行!");
-            getLogger().log(Level.SEVERE, "从此处下载: https://50l.cc/gzlib");
+            getLogger().log(Level.SEVERE, "从此处下载: https://50L.cc/gzlib");
+            getServer().getPluginManager().disablePlugin(this);
+            return;
+        }
+
+        try {
+            MinecraftVersionUtil.isAtLeast(1, 16, 4);
+        } catch (NoSuchMethodError e) {
+            getLogger().log(Level.SEVERE, "本插件需要 鬼斩前置库插件(GuizhanLibPlugin) 最新版本才能运行!");
+            getLogger().log(Level.SEVERE, "从此处下载: https://50L.cc/gzlib");
             getServer().getPluginManager().disablePlugin(this);
             return;
         }

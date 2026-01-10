@@ -1,21 +1,27 @@
 package io.github.thebusybiscuit.mobcapturer.utils.compatibility;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import io.github.thebusybiscuit.mobcapturer.MobCapturer;
-import io.github.thebusybiscuit.mobcapturer.utils.ReflectionUtils;
-import lombok.experimental.UtilityClass;
+
+import org.bukkit.NamespacedKey;
 import org.bukkit.Registry;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.entity.LivingEntity;
 
-import javax.annotation.Nonnull;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Level;
+import io.github.thebusybiscuit.mobcapturer.MobCapturer;
+import io.github.thebusybiscuit.mobcapturer.utils.ReflectionUtils;
+
+import lombok.experimental.UtilityClass;
 
 @UtilityClass
 public final class AttributeX {
@@ -36,20 +42,38 @@ public final class AttributeX {
     }
 
     @Nonnull
+    public static String getKey(@Nonnull Object attrObj) {
+        NamespacedKey nsKey = (NamespacedKey) ReflectionUtils.invoke(attrObj, "getKey");
+        return nsKey.toString();
+    }
+
+    @Nullable
     public static Attribute valueOf(@Nonnull String name) {
-        Attribute attr = (Attribute) ReflectionUtils.valueOf(Attribute.class, name);
-        if (attr == null) {
-            throw new IllegalArgumentException("No field found for Attribute with name " + name);
+        // first attempt, call valueOf directly
+        try {
+            Attribute attr1 = (Attribute) ReflectionUtils.valueOf(Attribute.class, name);
+            if (attr1 != null) {
+                return attr1;
+            }
+        } catch (Exception ignored) {
+            // first attempt failed, try second attempt
         }
-        return attr;
+
+        // second attempt, find by NamespacedKey
+        for (var attrObj : allAttributes) {
+            if (getKey(attrObj).equalsIgnoreCase(name)) {
+                return (Attribute) attrObj;
+            }
+        }
+        return null;
     }
 
     @Nonnull
     public static JsonObject serializeAttributesFromEntity(@Nonnull LivingEntity entity) {
         JsonObject attributes = new JsonObject();
 
-        for (var attribute : allAttributes) {
-            AttributeInstance instance = (AttributeInstance) ReflectionUtils.invoke(entity, "getAttribute", attribute);
+        for (var attr : allAttributes) {
+            AttributeInstance instance = entity.getAttribute((Attribute) attr);
             if (instance != null) {
                 JsonObject attributeObj = new JsonObject();
                 attributeObj.addProperty("base", instance.getBaseValue());
@@ -69,7 +93,7 @@ public final class AttributeX {
 
                 attributeObj.add("modifiers", modifiers);
 
-                attributes.add(attribute.toString(), attributeObj);
+                attributes.add(getKey(attr), attributeObj);
             }
         }
 

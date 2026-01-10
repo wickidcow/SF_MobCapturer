@@ -1,10 +1,10 @@
 package io.github.thebusybiscuit.mobcapturer.utils;
 
-import lombok.experimental.UtilityClass;
+import java.lang.reflect.InvocationTargetException;
 
 import javax.annotation.Nullable;
 
-import java.lang.reflect.InvocationTargetException;
+import lombok.experimental.UtilityClass;
 
 /**
  * Reflection utilities used for backward compatibility.
@@ -38,10 +38,10 @@ public final class ReflectionUtils {
     @Nullable
     public static Object valueOf(Class<?> clazz, String fieldName) {
         if (clazz.isEnum()) {
-            return Enum.valueOf(clazz.asSubclass(Enum.class), fieldName);
+            return Enum.valueOf(clazz.asSubclass(Enum.class), fieldName.toUpperCase());
         } else {
             try {
-                return clazz.getField(fieldName).get(null);
+                return clazz.getField(fieldName.toUpperCase()).get(null);
             } catch (Exception x) {
                 return null;
             }

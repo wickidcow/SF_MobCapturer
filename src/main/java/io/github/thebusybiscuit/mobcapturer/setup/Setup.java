@@ -2,8 +2,6 @@ package io.github.thebusybiscuit.mobcapturer.setup;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
-import io.github.thebusybiscuit.mobcapturer.adapters.mobs.HappyGhastAdapter;
-
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Armadillo;
@@ -12,6 +10,7 @@ import org.bukkit.entity.Blaze;
 import org.bukkit.entity.Bogged;
 import org.bukkit.entity.Breeze;
 import org.bukkit.entity.Camel;
+import org.bukkit.entity.CamelHusk;
 import org.bukkit.entity.CaveSpider;
 import org.bukkit.entity.Chicken;
 import org.bukkit.entity.Cod;
@@ -33,6 +32,7 @@ import org.bukkit.entity.Llama;
 import org.bukkit.entity.MagmaCube;
 import org.bukkit.entity.Mule;
 import org.bukkit.entity.Ocelot;
+import org.bukkit.entity.Parched;
 import org.bukkit.entity.Pillager;
 import org.bukkit.entity.PolarBear;
 import org.bukkit.entity.Ravager;
@@ -68,12 +68,14 @@ import io.github.thebusybiscuit.mobcapturer.adapters.mobs.FoxAdapter;
 import io.github.thebusybiscuit.mobcapturer.adapters.mobs.FrogAdapter;
 import io.github.thebusybiscuit.mobcapturer.adapters.mobs.GlowSquidAdapter;
 import io.github.thebusybiscuit.mobcapturer.adapters.mobs.GoatAdapter;
+import io.github.thebusybiscuit.mobcapturer.adapters.mobs.HappyGhastAdapter;
 import io.github.thebusybiscuit.mobcapturer.adapters.mobs.HoglinAdapter;
 import io.github.thebusybiscuit.mobcapturer.adapters.mobs.HorseAdapter;
 import io.github.thebusybiscuit.mobcapturer.adapters.mobs.IronGolemAdapter;
 import io.github.thebusybiscuit.mobcapturer.adapters.mobs.LlamaAdapter;
 import io.github.thebusybiscuit.mobcapturer.adapters.mobs.MagicIllagerAdapter;
 import io.github.thebusybiscuit.mobcapturer.adapters.mobs.MooshroomAdapter;
+import io.github.thebusybiscuit.mobcapturer.adapters.mobs.NautilusAdapter;
 import io.github.thebusybiscuit.mobcapturer.adapters.mobs.PandaAdapter;
 import io.github.thebusybiscuit.mobcapturer.adapters.mobs.ParrotAdapter;
 import io.github.thebusybiscuit.mobcapturer.adapters.mobs.PhantomAdapter;
@@ -98,6 +100,7 @@ import io.github.thebusybiscuit.mobcapturer.adapters.mobs.VexAdapter;
 import io.github.thebusybiscuit.mobcapturer.adapters.mobs.WolfAdapter;
 import io.github.thebusybiscuit.mobcapturer.adapters.mobs.ZoglinAdapter;
 import io.github.thebusybiscuit.mobcapturer.adapters.mobs.ZombieAdapter;
+import io.github.thebusybiscuit.mobcapturer.adapters.mobs.ZombieNautilusAdapter;
 import io.github.thebusybiscuit.mobcapturer.adapters.mobs.ZombieVillagerAdapter;
 import io.github.thebusybiscuit.mobcapturer.adapters.mobs.ZombifiedPiglinAdapter;
 import io.github.thebusybiscuit.mobcapturer.items.MobCannon;
@@ -186,15 +189,15 @@ public final class Setup {
         registerMob(EntityType.AXOLOTL, new AxolotlAdapter(), "62d90ad63dd826df02994abdcc6c2306163e1072d1b9e63ad4e7d7d1cf87cdf9");
         // https://minecraft-heads.com/custom-heads/decoration/46397-spawn-egg-goat
         registerMob(EntityType.GOAT, new GoatAdapter(), "33f7fe31285bd2ca74516b07852e079447f524fd9cc0b7d4db003b165d5b4b4");
-        if (MinecraftVersionUtil.isAtLeast(19)) {
+        if (MinecraftVersionUtil.isAtLeast(1, 19)) {
             // https://minecraft-heads.com/custom-heads/decoration/56964-spawn-egg-frog
             registerMob(EntityType.FROG, new FrogAdapter(), "2d767bfee87d1d301084c74dadade50fc49263a465e4c1065549dbf8403f194c");
         }
-        if (MinecraftVersionUtil.isAtLeast(20)) {
+        if (MinecraftVersionUtil.isAtLeast(1, 20)) {
             // https://minecraft-heads.com/custom-heads/head/84109-spawn-egg-sniffer
             registerMob(EntityType.SNIFFER, new SnifferAdapter(), "a9946dda3e6162dfaf37921bab6bd31b87a3000624848b65eca1efe73167c960");
         }
-        if (MinecraftVersionUtil.isAtLeast(20, 5)) {
+        if (MinecraftVersionUtil.isAtLeast(1, 20, 5)) {
             // https://minecraft-heads.com/custom-heads/head/109893-spawn-egg-armadillo
             registerMob(EntityType.ARMADILLO, new AnimalsAdapter<>(Armadillo.class), "2c8abc4e6fc02333ae72a8526fb41e87a348e31cf09f398d36a4398786605abd");
         }
@@ -215,20 +218,20 @@ public final class Setup {
         registerMob(EntityType.SILVERFISH, new StandardMobAdapter<>(Silverfish.class), "d06310a8952b265c6e6bed4348239ddea8e5482c8c68be6fff981ba8056bf2e");
         // https://minecraft-heads.com/custom-heads/decoration/933-spawn-egg-bat
         registerMob(EntityType.BAT, new StandardMobAdapter<>(Bat.class), "93c8aa3fde295fa9f9c27f734bdbab11d33a2e43e855accd7465352377413b");
-        if (MinecraftVersionUtil.isAtLeast(19)) {
+        if (MinecraftVersionUtil.isAtLeast(1, 19)) {
             // https://minecraft-heads.com/custom-heads/decoration/56963-spawn-egg-allay
             registerMob(EntityType.ALLAY, new AllayAdapter(), "6c3f114efbd908284c7aadd81993769057361dd756bf5e7883b8e0b1cea446e7");
         }
-        if (MinecraftVersionUtil.isAtLeast(21)) {
+        if (MinecraftVersionUtil.isAtLeast(1, 21)) {
             // https://minecraft-heads.com/custom-heads/head/109899-spawn-egg-breeze
             registerMob(EntityType.BREEZE, new StandardMobAdapter<>(Breeze.class), "38eef639b9c151ee810adf488f29f74b9077dcc8c4816e27a34a6491fce04677");
         }
-        if (MinecraftVersionUtil.isAtLeast(21, 4)) {
+        if (MinecraftVersionUtil.isAtLeast(1, 21, 4)) {
             // https://minecraft-heads.com/index.php/custom-heads/head/111645-creaking
             // TODO: spawn egg texture for creaking
             registerMob(EntityType.CREAKING, new StandardMobAdapter<>(Creaking.class), "a575bac234cf86b124d3cc870bd6b737d27679673a616faf2e996f9949c6153f");
         }
-        if (MinecraftVersionUtil.isAtLeast(21, 6)) {
+        if (MinecraftVersionUtil.isAtLeast(1, 21, 6)) {
             // https://minecraft-heads.com/custom-heads/head/117418-happy-ghast
             // TODO: spawn egg texture for happy ghast
             registerMob(EntityType.HAPPY_GHAST, new HappyGhastAdapter(), "a1a36cb93d01675c4622dd5c8d872110911ec12c372e89afa8ba03862867f6fb");
@@ -246,6 +249,14 @@ public final class Setup {
         registerMob(EntityType.DOLPHIN, new StandardMobAdapter<>(Dolphin.class), "2480cd9577e2173e1c9de5e41318bd859696215a0a7de9242f01c01b8e6c06bf");
         // https://minecraft-heads.com/custom-heads/decoration/48544-spawn-egg-glow-squid
         registerMob(EntityType.GLOW_SQUID, new GlowSquidAdapter(), "e5d31559261b3e79024751fe07b711c8feef51d56c03635226955805bc42894e");
+        if (MinecraftVersionUtil.isAtLeast(1, 21, 11)) {
+            // https://minecraft-heads.com/custom-heads/head/123259-nautilus
+            // TODO: spawn egg texture for nautilus
+            registerMob(EntityType.NAUTILUS, new NautilusAdapter(), "3bb340dd3302615348de5162fe1670b9c5c9c616cd92d2de9d8398cb33e842ae");
+            // https://minecraft-heads.com/custom-heads/head/123260-zombie-nautilus
+            // TODO: spawn egg texture for zombie nautilus
+            registerMob(EntityType.ZOMBIE_NAUTILUS, new ZombieNautilusAdapter(), "fd9a933376da44c3391307cb9f4cf03f16f3a54f495fd5a11bad8a373f9d5720");
+        }
         // </editor-fold>
 
         // <editor-fold desc="Tameables">
@@ -322,7 +333,7 @@ public final class Setup {
         registerMob(EntityType.PUFFERFISH, new PufferFishAdapter(), "5d5e7d191478efafe23a654de802760f42a0dd83dfc9817f87d460fcf32978df");
         // https://minecraft-heads.com/custom-heads/decoration/23712-spawn-egg-tropical-fish
         registerMob(EntityType.TROPICAL_FISH, new TropicalFishAdapter(), "2e4385d58fe46dd96422f31d35bbd1568e5819bbdb7a196c9f113424582cf977");
-        if (MinecraftVersionUtil.isAtLeast(19)) {
+        if (MinecraftVersionUtil.isAtLeast(1, 19)) {
             // https://minecraft-heads.com/custom-heads/decoration/56962-spawn-egg-tadpole
             registerMob(EntityType.TADPOLE, new TadpoleAdapter(), "d1f04d08180a7a5cc63055587a2ecde5ac86f9f48f0e3b0ee3a986638877aeef");
         }
@@ -343,9 +354,13 @@ public final class Setup {
         registerMob(EntityType.LLAMA, new LlamaAdapter<>(Llama.class), "5cbc6bd92728d79cfa6d8f23cbae9d912f495920b9e95ef691a1967fef8a4453");
         // https://minecraft-heads.com/custom-heads/decoration/48537-spawn-egg-wandering-trader-llama
         registerMob(EntityType.TRADER_LLAMA, new LlamaAdapter<>(TraderLlama.class), "73ca3bfb6602a96a57369cbc85eba8bb53df796d0df3dbc3798fa3d8e9e30275");
-        if (MinecraftVersionUtil.isAtLeast(20)) {
+        if (MinecraftVersionUtil.isAtLeast(1, 20)) {
             // https://minecraft-heads.com/custom-heads/head/84108-spawn-egg-camel
             registerMob(EntityType.CAMEL, new CamelAdapter<>(Camel.class), "11e9bf25f3458da2e5dddac0a6ae81ed256c5510b507094781b9c4682cbf5d0d");
+        }
+        if (MinecraftVersionUtil.isAtLeast(1, 21, 11)) {
+            // https://minecraft-heads.com/custom-heads/head/123519-camel-husk
+            registerMob(EntityType.CAMEL_HUSK, new CamelAdapter<>(CamelHusk.class), "3bd7a92a6f67b7500d16c4e12f28058ec2859311556ba03be2d1f581170f2db6");
         }
         // </editor-fold>
 
@@ -356,9 +371,13 @@ public final class Setup {
         registerMob(EntityType.WITHER_SKELETON, new SkeletonAdapter<>(WitherSkeleton.class), "337223d01906ab63af1a15988343b8637e85930b905c35125b545b398c59e1c5");
         // https://minecraft-heads.com/custom-heads/decoration/23705-spawn-egg-stray
         registerMob(EntityType.STRAY, new SkeletonAdapter<>(Stray.class), "5b45aae241779f0617ffaff468f3f2cf666d2f8a803002f9ae1ba0f14ed79fdd");
-        if (MinecraftVersionUtil.isAtLeast(21)) {
+        if (MinecraftVersionUtil.isAtLeast(1, 21)) {
             // https://minecraft-heads.com/custom-heads/head/109898-spawn-egg-bogged
             registerMob(EntityType.BOGGED, new SkeletonAdapter<>(Bogged.class), "64722ae02b77d1288f7afee8b8c752796923f9b9840ff47d98d2a470a3d990fb");
+        }
+        if (MinecraftVersionUtil.isAtLeast(1, 21, 11)) {
+            // https://minecraft-heads.com/custom-heads/head/123518-parched
+            registerMob(EntityType.PARCHED, new SkeletonAdapter<>(Parched.class), "24aeceff5f26dd8413c5c03547c234ac03108d187af0b9cd834a8ce12598591c");
         }
         // </editor-fold>
 
