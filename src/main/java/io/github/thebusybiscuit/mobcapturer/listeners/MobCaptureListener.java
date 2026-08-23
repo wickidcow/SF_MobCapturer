@@ -13,6 +13,7 @@ import org.bukkit.event.Listener;
 
 import io.github.thebusybiscuit.mobcapturer.MobCapturer;
 import io.github.thebusybiscuit.mobcapturer.events.MobCaptureEvent;
+import io.github.thebusybiscuit.mobcapturer.utils.ProtectedMobDetector;
 import io.github.thebusybiscuit.slimefun4.implementation.Slimefun;
 import io.github.thebusybiscuit.slimefun4.libraries.dough.config.Config;
 import io.github.thebusybiscuit.slimefun4.libraries.dough.protection.Interaction;
@@ -24,7 +25,10 @@ import io.github.thebusybiscuit.slimefun4.libraries.dough.protection.Interaction
  */
 public class MobCaptureListener implements Listener {
 
+    private final ProtectedMobDetector protectedMobs;
+
     public MobCaptureListener(@Nonnull MobCapturer plugin) {
+        this.protectedMobs = new ProtectedMobDetector(plugin);
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
     }
 
@@ -33,6 +37,14 @@ public class MobCaptureListener implements Listener {
         Config config = MobCapturer.getRegistry().getConfig();
         LivingEntity entity = e.getEntity();
         Player p = e.getPlayer();
+
+        // Never convert entities managed by EliteMobs or MythicMobs into MobCapturer eggs.
+        String blockingPlugin = protectedMobs.getBlockingPlugin(entity);
+        if (blockingPlugin != null) {
+            e.setCancelled(true);
+            p.sendMessage(ChatColor.RED + "This mob cannot be captured because it is managed by " + blockingPlugin + ".");
+            return;
+        }
 
         // permission check
         if (!Slimefun.getProtectionManager().hasPermission(p, entity.getLocation(), Interaction.ATTACK_ENTITY)) {
@@ -50,7 +62,7 @@ public class MobCaptureListener implements Listener {
 
             // check ignored name list
             List<String> ignoredMobNames = config.getStringList("options.ignored-mobs");
-            if (ignoredMobNames.size() > 0) {
+            if (!ignoredMobNames.isEmpty()) {
                 String strippedEntityName = ChatColor.stripColor(entity.getCustomName());
                 for (String ignoredMobName : ignoredMobNames) {
                     if (ignoredMobName.equalsIgnoreCase(strippedEntityName)) {
