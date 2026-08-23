@@ -16,13 +16,23 @@ repositories {
     maven("https://jitpack.io")
 }
 
+val slimefunLegacyJar = file("libs/Slimefun-Legacy.jar")
+
 dependencies {
     compileOnly("io.papermc.paper:paper-api:26.2.build.+") {
         attributes {
             attribute(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, 25)
         }
     }
-    compileOnly("com.github.slimefun:Slimefun:4.1.37")
+
+    if (slimefunLegacyJar.exists()) {
+        compileOnly(files(slimefunLegacyJar))
+    } else {
+        // Local-development fallback. Release CI always compiles against the exact
+        // Slimefun Legacy 4.1.37 JAR built from the tagged source.
+        compileOnly("com.github.slimefunguguproject:Slimefun4:5c188a3c0a")
+    }
+
     compileOnly("net.guizhanss:GuizhanLibPlugin:2.5.0")
 
     compileOnly("org.projectlombok:lombok:1.18.44")

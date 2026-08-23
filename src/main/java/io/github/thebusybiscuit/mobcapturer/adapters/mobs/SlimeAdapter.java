@@ -8,11 +8,14 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import com.google.gson.JsonObject;
 
 import org.bukkit.ChatColor;
-import org.bukkit.entity.Slime;
+import org.bukkit.entity.AbstractCubeMob;
 
 import io.github.thebusybiscuit.mobcapturer.adapters.MobAdapter;
 
-public class SlimeAdapter<T extends Slime> implements MobAdapter<T> {
+/**
+ * Stores the shared size data used by modern cube mobs such as Slimes and Magma Cubes.
+ */
+public class SlimeAdapter<T extends AbstractCubeMob> implements MobAdapter<T> {
 
     private final Class<T> entityClass;
 
@@ -25,7 +28,7 @@ public class SlimeAdapter<T extends Slime> implements MobAdapter<T> {
     public List<String> getLore(@Nonnull JsonObject json) {
         List<String> lore = MobAdapter.super.getLore(json);
 
-        lore.add(ChatColor.GRAY + "大小: " + ChatColor.WHITE + json.get("size").getAsInt());
+        lore.add(ChatColor.GRAY + "Size: " + ChatColor.WHITE + json.get("size").getAsInt());
 
         return lore;
     }
@@ -34,7 +37,6 @@ public class SlimeAdapter<T extends Slime> implements MobAdapter<T> {
     @ParametersAreNonnullByDefault
     public void apply(T entity, JsonObject json) {
         MobAdapter.super.apply(entity, json);
-
         entity.setSize(json.get("size").getAsInt());
     }
 
@@ -42,9 +44,7 @@ public class SlimeAdapter<T extends Slime> implements MobAdapter<T> {
     @Override
     public JsonObject saveData(@Nonnull T entity) {
         JsonObject json = MobAdapter.super.saveData(entity);
-
         json.addProperty("size", entity.getSize());
-
         return json;
     }
 
@@ -53,5 +53,4 @@ public class SlimeAdapter<T extends Slime> implements MobAdapter<T> {
     public Class<T> getEntityClass() {
         return entityClass;
     }
-
 }
