@@ -11,7 +11,13 @@ permissions:
 
 jobs:
   build:
+    name: ${{ matrix.platform }} 26.2
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: [paper, purpur, folia]
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -42,29 +48,47 @@ jobs:
           test -n "$SLIMEFUN_JAR"
           cp "$SLIMEFUN_JAR" libs/Slimefun-Legacy.jar
 
-      - name: Build raw JAR
-        run: ./gradlew clean shadowJar --stacktrace
+      - name: Build against ${{ matrix.platform }} API
+        run: ./gradlew clean shadowJar -Pplatform=${{ matrix.platform }} --stacktrace
 
-      - name: Verify release artifact
-        run: test -f build/libs/SF_MobCapturer1.0.0.jar
+      - name: Verify Folia safety declarations
+        if: matrix.platform == 'paper'
+        run: |
+          JAR=build/libs/SF_MobCapturer1.0.1.jar
+          test -f "$JAR"
+          unzip -p "$JAR" plugin.yml > build/plugin.yml
+          grep -q '^folia-supported: true$' build/plugin.yml
+          if grep -q 'GuizhanLibPlugin' build/plugin.yml; then
+            echo 'GuizhanLibPlugin must not be a runtime dependency' >&2
+            exit 1
+          fi
+          if grep -R -nE 'BukkitRunnable|BukkitScheduler|getScheduler\(|runTask(Later|Timer)?\(' src/main/java; then
+            echo 'Legacy Bukkit scheduler usage found; review before Folia release.' >&2
+            exit 1
+          fi
 
-      - name: Upload build artifact
+      - name: Verify raw release artifact
+        if: matrix.platform == 'paper'
+        run: test -f build/libs/SF_MobCapturer1.0.1.jar
+
+      - name: Upload raw JAR artifact
+        if: matrix.platform == 'paper'
         uses: actions/upload-artifact@v4
         with:
-          name: SF_MobCapturer1.0.0
-          path: build/libs/SF_MobCapturer1.0.0.jar
+          name: SF_MobCapturer1.0.1
+          path: build/libs/SF_MobCapturer1.0.1.jar
           if-no-files-found: error
 
       - name: Publish GitHub release
-        if: github.event_name == 'push' && contains(github.event.head_commit.message, '[release]')
+        if: matrix.platform == 'paper' && github.event_name == 'push' && contains(github.event.head_commit.message, '[release]')
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          if gh release view v1.0.0 >/dev/null 2>&1; then
-            gh release upload v1.0.0 build/libs/SF_MobCapturer1.0.0.jar --clobber
+          if gh release view v1.0.1 >/dev/null 2>&1; then
+            gh release upload v1.0.1 build/libs/SF_MobCapturer1.0.1.jar --clobber
           else
-            gh release create v1.0.0 build/libs/SF_MobCapturer1.0.0.jar \
+            gh release create v1.0.1 build/libs/SF_MobCapturer1.0.1.jar \
               --target "$GITHUB_SHA" \
-              --title "SF MobCapturer 1.0.0" \
+              --title "SF MobCapturer 1.0.1" \
               --notes-file RELEASE_NOTES.md
           fi
