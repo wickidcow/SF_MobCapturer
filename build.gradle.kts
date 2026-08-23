@@ -11,15 +11,23 @@ repositories {
     mavenLocal()
     mavenCentral()
     maven("https://repo.papermc.io/repository/maven-public/")
+    maven("https://repo.purpurmc.org/snapshots")
     maven("https://maven.norain.city/releases")
     maven("https://maven.norain.city/snapshots")
     maven("https://jitpack.io")
 }
 
 val slimefunLegacyJar = file("libs/Slimefun-Legacy.jar")
+val platform = providers.gradleProperty("platform").orElse("paper").get().lowercase()
+val platformApi = when (platform) {
+    "paper" -> "io.papermc.paper:paper-api:26.2.build.+"
+    "purpur" -> "org.purpurmc.purpur:purpur-api:26.2.build.+"
+    "folia" -> "dev.folia:folia-api:26.2.build.+"
+    else -> error("Unsupported platform '$platform'. Use paper, purpur, or folia.")
+}
 
 dependencies {
-    compileOnly("io.papermc.paper:paper-api:26.2.build.+") {
+    compileOnly(platformApi) {
         attributes {
             attribute(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, 25)
         }
