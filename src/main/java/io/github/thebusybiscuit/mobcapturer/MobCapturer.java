@@ -18,7 +18,7 @@ import net.guizhanss.guizhanlib.minecraft.utils.MinecraftVersionUtil;
 import net.guizhanss.minecraft.guizhanlib.updater.GuizhanUpdater;
 
 /**
- * MobCapturer Slimefun addon
+ * MobCapturer Slimefun addon.
  *
  * @author TheBusyBiscuit
  * @author ybw0014
@@ -48,8 +48,8 @@ public class MobCapturer extends JavaPlugin implements SlimefunAddon {
         setInstance(this);
 
         if (!getServer().getPluginManager().isPluginEnabled("GuizhanLibPlugin")) {
-            getLogger().log(Level.SEVERE, "本插件需要 鬼斩前置库插件(GuizhanLibPlugin) 才能运行!");
-            getLogger().log(Level.SEVERE, "从此处下载: https://50L.cc/gzlib");
+            getLogger().log(Level.SEVERE, "MobCapturer requires GuizhanLibPlugin to run.");
+            getLogger().log(Level.SEVERE, "Download it from: https://50L.cc/gzlib");
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
@@ -57,8 +57,8 @@ public class MobCapturer extends JavaPlugin implements SlimefunAddon {
         try {
             MinecraftVersionUtil.isAtLeast(1, 16, 4);
         } catch (NoSuchMethodError e) {
-            getLogger().log(Level.SEVERE, "本插件需要 鬼斩前置库插件(GuizhanLibPlugin) 最新版本才能运行!");
-            getLogger().log(Level.SEVERE, "从此处下载: https://50L.cc/gzlib");
+            getLogger().log(Level.SEVERE, "MobCapturer requires the latest GuizhanLibPlugin version.");
+            getLogger().log(Level.SEVERE, "Download it from: https://50L.cc/gzlib");
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
@@ -67,14 +67,12 @@ public class MobCapturer extends JavaPlugin implements SlimefunAddon {
         new Metrics(this, 6672);
 
         if (cfg.getBoolean("options.auto-update") && getPluginVersion().startsWith("Build")) {
-            GuizhanUpdater.start(this, getFile(), "SlimefunGuguProject", "MobCapturer", "master");
+            GuizhanUpdater.start(this, getFile(), "wickidcow", "SF_MobCapturer", "master");
         }
 
         registry = new Registry(cfg);
-
         Setup.setup();
 
-        // listeners
         new PelletListener(this);
         new MobCaptureListener(this);
     }
@@ -82,7 +80,7 @@ public class MobCapturer extends JavaPlugin implements SlimefunAddon {
     @Override
     @Nonnull
     public String getBugTrackerURL() {
-        return "https://github.com/SlimefunGuguProject/MobCapturer/issues";
+        return "https://github.com/wickidcow/SF_MobCapturer/issues";
     }
 
     @Override
