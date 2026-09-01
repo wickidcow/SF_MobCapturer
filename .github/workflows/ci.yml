@@ -87,22 +87,23 @@ jobs:
           fi
           grep -Fq 'version = "1.0.3"' build.gradle.kts
           grep -Fq 'apiVersion = "1.21.11"' build.gradle.kts
-          grep -Fq 'options.release.set(21)' build.gradle.kts
+          grep -Fq 'releaseJvm = providers.gradleProperty("releaseJvm").orElse("21")' build.gradle.kts
+          grep -Fq 'options.release.set(releaseJvm)' build.gradle.kts
           grep -Fq 'EntityType.COPPER_GOLEM' src/main/java/io/github/thebusybiscuit/mobcapturer/setup/ModernMobSetup.java
           grep -Fq 'EntityType.valueOf("SULFUR_CUBE")' src/main/java/io/github/thebusybiscuit/mobcapturer/setup/ModernMobSetup.java
           grep -Fq 'ModernMobSetup.setup();' src/main/java/io/github/thebusybiscuit/mobcapturer/MobCapturer.java
       - name: Verify Paper/Purpur 1.21.11 compilation
         run: |
           chmod +x gradlew
-          ./gradlew clean shadowJar -Pplatform=paper -PplatformVersion=1.21.11-R0.1-SNAPSHOT --stacktrace --no-daemon
+          ./gradlew clean shadowJar -Pplatform=paper -PplatformVersion=1.21.11-R0.1-SNAPSHOT -PreleaseJvm=21 --stacktrace --no-daemon
       - name: Verify Paper 26.2 compilation
-        run: ./gradlew clean compileJava -Pplatform=paper -PplatformVersion=26.2.build.+ --stacktrace --no-daemon
+        run: ./gradlew clean compileJava -Pplatform=paper -PplatformVersion=26.2.build.+ -PreleaseJvm=25 --stacktrace --no-daemon
       - name: Verify Purpur 26.2 compilation
-        run: ./gradlew clean compileJava -Pplatform=purpur -PplatformVersion=26.2.build.+ --stacktrace --no-daemon
+        run: ./gradlew clean compileJava -Pplatform=purpur -PplatformVersion=26.2.build.+ -PreleaseJvm=25 --stacktrace --no-daemon
       - name: Verify Folia 26.2 compilation
-        run: ./gradlew clean compileJava -Pplatform=folia -PplatformVersion=26.2.build.+ --stacktrace --no-daemon
+        run: ./gradlew clean compileJava -Pplatform=folia -PplatformVersion=26.2.build.+ -PreleaseJvm=25 --stacktrace --no-daemon
       - name: Build universal release JAR from 1.21.11 baseline
-        run: ./gradlew clean shadowJar -Pplatform=paper -PplatformVersion=1.21.11-R0.1-SNAPSHOT --stacktrace --no-daemon
+        run: ./gradlew clean shadowJar -Pplatform=paper -PplatformVersion=1.21.11-R0.1-SNAPSHOT -PreleaseJvm=21 --stacktrace --no-daemon
       - name: Verify release artifact
         shell: bash
         run: |
