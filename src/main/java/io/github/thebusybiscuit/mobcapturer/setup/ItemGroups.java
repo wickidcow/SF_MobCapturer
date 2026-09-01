@@ -26,7 +26,7 @@ public final class ItemGroups {
         new SlimefunItemStack(
             "MOB_CAPTURER",
             "d429ff1d2015cb11398471bb2f895f7b4c3ccec201e4ad7a86ff24b744878c",
-            "&d生物捕捉"
+            "&dMob Capturer"
         )
     );
     public static final SubItemGroup TOOLS = new SubItemGroup(
@@ -34,7 +34,7 @@ public final class ItemGroups {
         MAIN,
         new CustomItemStack(
             ItemStacks.MOB_CANNON,
-            "&d工具"
+            "&dTools"
         )
     );
     public static final SubItemGroup MOB_EGGS = new SubItemGroup(
@@ -42,7 +42,7 @@ public final class ItemGroups {
         MAIN,
         new CustomItemStack(
             Material.CHICKEN_SPAWN_EGG,
-            "&a刷怪蛋"
+            "&aMob Eggs"
         )
     );
 }

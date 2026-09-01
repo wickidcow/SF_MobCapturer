@@ -10,8 +10,6 @@ import org.bukkit.entity.EntityType;
 
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack;
 
-import net.guizhanss.minecraft.guizhanlib.gugu.minecraft.helpers.entity.EntityTypeHelper;
-
 import lombok.experimental.UtilityClass;
 
 /**
@@ -26,16 +24,16 @@ public final class ItemStacks {
     public static final SlimefunItemStack MOB_CANNON = new SlimefunItemStack(
         "MOB_CANNON",
         Material.BLAZE_ROD,
-        "&6生物捕捉枪",
+        "&6Mob Capturing Cannon",
         "",
-        "&e右键点击&7射出一枚&f生物捕捉弹"
+        "&eRight-click &7to fire a &fMob Capturing Pellet"
     );
     public static final SlimefunItemStack MOB_CAPTURING_PELLET = new SlimefunItemStack(
         "MOB_CAPTURING_PELLET",
         "983b30e9d135b05190eea2c3ac61e2ab55a2d81e1a58dbb26983a14082664",
-        "&f生物捕捉弹",
+        "&fMob Capturing Pellet",
         "",
-        "&7是&6生物捕捉枪&7的弹药"
+        "&7Ammunition for the &6Mob Capturing Cannon"
     );
 
     @Nonnull
@@ -47,10 +45,32 @@ public final class ItemStacks {
         return new SlimefunItemStack(
             "MOB_EGG_" + type,
             eggTexture,
-            "&a刷怪蛋 &7(" + EntityTypeHelper.getName(type) + ")",
+            "&aMob Egg &7(" + friendlyEntityName(type) + ")",
             "",
-            "&7对着方块右键点击此物品",
-            "&7即可释放捕捉的生物"
+            "&7Right-click a block with this item",
+            "&7to release the captured mob"
         );
+    }
+
+    private static String friendlyEntityName(EntityType type) {
+        String[] words = type.name().toLowerCase(java.util.Locale.ROOT).split("_");
+        StringBuilder result = new StringBuilder();
+
+        for (String word : words) {
+            if (word.isEmpty()) {
+                continue;
+            }
+
+            if (!result.isEmpty()) {
+                result.append(' ');
+            }
+
+            result.append(Character.toUpperCase(word.charAt(0)));
+            if (word.length() > 1) {
+                result.append(word.substring(1));
+            }
+        }
+
+        return result.toString();
     }
 }

@@ -16,5 +16,10 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public final class Researches {
 
-    public static final Research MOB_CAPTURING = new Research(new NamespacedKey(MobCapturer.getInstance(), "mob_capturing"), 32652, "捕捉生物", 28);
+    public static final Research MOB_CAPTURING = new Research(
+        new NamespacedKey(MobCapturer.getInstance(), "mob_capturing"),
+        32652,
+        "Mob Capturing",
+        28
+    );
 }

@@ -1,5 +1,3 @@
-import org.gradle.api.attributes.java.TargetJvmVersion
-
 plugins {
     id("java")
     id("maven-publish")
@@ -19,25 +17,22 @@ repositories {
 
 val slimefunLegacyJar = file("libs/Slimefun-Legacy.jar")
 val platform = providers.gradleProperty("platform").orElse("paper").get().lowercase()
+val platformVersion = providers.gradleProperty("platformVersion").orElse(
+    if (platform == "folia") "26.2.build.+" else "1.21.11-R0.1-SNAPSHOT"
+).get()
 val platformApi = when (platform) {
-    "paper" -> "io.papermc.paper:paper-api:26.2.build.+"
-    "purpur" -> "org.purpurmc.purpur:purpur-api:26.2.build.+"
-    "folia" -> "dev.folia:folia-api:26.2.build.+"
+    "paper" -> "io.papermc.paper:paper-api:$platformVersion"
+    "purpur" -> "org.purpurmc.purpur:purpur-api:$platformVersion"
+    "folia" -> "dev.folia:folia-api:$platformVersion"
     else -> error("Unsupported platform '$platform'. Use paper, purpur, or folia.")
 }
 
 dependencies {
-    compileOnly(platformApi) {
-        attributes {
-            attribute(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, 25)
-        }
-    }
+    compileOnly(platformApi)
 
     if (slimefunLegacyJar.exists()) {
         compileOnly(files(slimefunLegacyJar))
     } else {
-        // Local-development fallback. Release CI always compiles against the exact
-        // Slimefun Legacy 4.1.37 JAR built from the tagged source.
         compileOnly("com.github.slimefunguguproject:Slimefun4:5c188a3c0a")
     }
 
@@ -49,8 +44,8 @@ dependencies {
 }
 
 group = "io.github.wickidcow"
-version = "1.0.1"
-description = "MobCapturer for Slimefun Legacy"
+version = "1.0.2"
+description = "MobCapturer for Slimefun Legacy on Minecraft 1.21.11 through 26.2"
 
 java {
     toolchain.languageVersion.set(JavaLanguageVersion.of(25))
@@ -95,7 +90,7 @@ publishing {
 
 bukkit {
     main = "io.github.thebusybiscuit.mobcapturer.MobCapturer"
-    apiVersion = "1.21"
+    apiVersion = "1.21.11"
     foliaSupported = true
     authors = listOf("TheBusyBiscuit", "ybw0014", "wickidcow")
     description = "A Slimefun Legacy addon that adds reusable mob capture tools"
