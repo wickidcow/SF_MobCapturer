@@ -46,8 +46,9 @@ jobs:
           set -euo pipefail
           cp .upstream-english/src/main/java/io/github/thebusybiscuit/mobcapturer/setup/RecipeTypes.java \
              src/main/java/io/github/thebusybiscuit/mobcapturer/setup/RecipeTypes.java
-          cp .upstream-english/src/main/java/io/github/thebusybiscuit/mobcapturer/adapters/mobs/*.java \
-             src/main/java/io/github/thebusybiscuit/mobcapturer/adapters/mobs/
+          find .upstream-english/src/main/java/io/github/thebusybiscuit/mobcapturer/adapters/mobs \
+            -maxdepth 1 -type f -name '*.java' ! -name 'SlimeAdapter.java' \
+            -exec cp {} src/main/java/io/github/thebusybiscuit/mobcapturer/adapters/mobs/ \;
       - name: Build Slimefun Legacy API target
         shell: bash
         run: |
@@ -89,6 +90,7 @@ jobs:
           grep -Fq 'apiVersion = "1.21.11"' build.gradle.kts
           grep -Fq 'releaseJvm = providers.gradleProperty("releaseJvm").orElse("21")' build.gradle.kts
           grep -Fq 'options.release.set(releaseJvm)' build.gradle.kts
+          grep -Fq 'class SlimeAdapter<T extends Mob>' src/main/java/io/github/thebusybiscuit/mobcapturer/adapters/mobs/SlimeAdapter.java
           grep -Fq 'EntityType.COPPER_GOLEM' src/main/java/io/github/thebusybiscuit/mobcapturer/setup/ModernMobSetup.java
           grep -Fq 'EntityType.valueOf("SULFUR_CUBE")' src/main/java/io/github/thebusybiscuit/mobcapturer/setup/ModernMobSetup.java
           grep -Fq 'ModernMobSetup.setup();' src/main/java/io/github/thebusybiscuit/mobcapturer/MobCapturer.java
@@ -134,7 +136,7 @@ jobs:
           set -euo pipefail
           if [[ "$GITHUB_REF" == refs/tags/v* ]]; then TAG="$GITHUB_REF_NAME"; else TAG="v1.0.3"; fi
           JAR=build/libs/SF_MobCapturer1.0.3.jar
-          NOTES="MobCapturer 1.0.3: no GuizhanLibPlugin runtime dependency; authoritative English release text; Java 21 universal bytecode for Minecraft/Purpur 1.21.11 through Paper/Purpur 26.2; Copper Golem support with weathering/state preservation; Sulfur Cube support on 26.2 through runtime-safe discovery with size/wander/fuse preservation; existing Armadillo, Breeze, Bogged, Creaking, Happy Ghast, Nautilus, Zombie Nautilus, Camel Husk and Parched support retained; Folia 26.2 compile validation retained."
+          NOTES="MobCapturer 1.0.3: no GuizhanLibPlugin runtime dependency; authoritative English release text; Java 21 universal bytecode for Minecraft/Purpur 1.21.11 through Paper/Purpur 26.2; cross-version Slime/MagmaCube size capture; Copper Golem support with weathering/state preservation; Sulfur Cube support on 26.2 through runtime-safe discovery with size/wander/fuse preservation; existing Armadillo, Breeze, Bogged, Creaking, Happy Ghast, Nautilus, Zombie Nautilus, Camel Husk and Parched support retained; Folia 26.2 compile validation retained."
           if gh release view "$TAG" >/dev/null 2>&1; then
             gh release upload "$TAG" "$JAR" --clobber
           else
