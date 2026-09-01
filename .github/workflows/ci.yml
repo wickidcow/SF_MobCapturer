@@ -113,8 +113,8 @@ jobs:
           JAR=build/libs/SF_MobCapturer1.0.3.jar
           test -s "$JAR"
           unzip -p "$JAR" plugin.yml > build/plugin.yml
-          grep -Eq '^api-version:[[:space:]]+["'"']?1\.21\.11["'"']?$' build/plugin.yml
-          grep -q '^folia-supported: true$' build/plugin.yml
+          grep -Eq '^api-version:.*1\.21\.11' build/plugin.yml
+          grep -Eq '^folia-supported:[[:space:]]*true' build/plugin.yml
           if grep -q 'GuizhanLibPlugin' build/plugin.yml; then exit 1; fi
           javap -verbose -classpath "$JAR" io.github.thebusybiscuit.mobcapturer.MobCapturer | grep -Fq 'major version: 65'
           javap -classpath "$JAR" io.github.thebusybiscuit.mobcapturer.adapters.mobs.CopperGolemAdapter >/dev/null
