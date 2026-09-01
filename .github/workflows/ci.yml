@@ -60,7 +60,7 @@ jobs:
           mapfile -t jars < <(find .slimefun-legacy/build/libs -maxdepth 1 -type f -name 'Slimefun-*.jar' ! -name '*-sources.jar' ! -name '*-javadoc.jar')
           test "${#jars[@]}" -ge 1
           cp "${jars[0]}" libs/Slimefun-Legacy.jar
-      - name: Verify English-only source and metadata
+      - name: Verify English and dependency policy
         shell: bash
         run: |
           set -euo pipefail
@@ -79,15 +79,18 @@ jobs:
                   if re.search(r'[\u3400-\u4dbf\u4e00-\u9fff]', text):
                       bad.append(str(p))
           if bad:
-              raise SystemExit('CJK text remains in: ' + ', '.join(bad))
+              raise SystemExit('CJK text remains in release source: ' + ', '.join(bad))
           PY
-          if grep -R -n 'net\.guizhanss' src/main/java; then
-            echo 'Gugu-only source dependency remains.' >&2
+          if grep -En 'net\.guizhanss:guizhanlib|GuizhanLibPlugin' build.gradle.kts; then
+            echo 'External GuizhanLib dependency remains in the build.' >&2
             exit 1
           fi
-          grep -Fq 'version = "1.0.2"' build.gradle.kts
+          grep -Fq 'version = "1.0.3"' build.gradle.kts
           grep -Fq 'apiVersion = "1.21.11"' build.gradle.kts
           grep -Fq 'options.release.set(21)' build.gradle.kts
+          grep -Fq 'EntityType.COPPER_GOLEM' src/main/java/io/github/thebusybiscuit/mobcapturer/setup/ModernMobSetup.java
+          grep -Fq 'EntityType.valueOf("SULFUR_CUBE")' src/main/java/io/github/thebusybiscuit/mobcapturer/setup/ModernMobSetup.java
+          grep -Fq 'ModernMobSetup.setup();' src/main/java/io/github/thebusybiscuit/mobcapturer/MobCapturer.java
       - name: Verify Paper/Purpur 1.21.11 compilation
         run: |
           chmod +x gradlew
@@ -104,19 +107,21 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          JAR=build/libs/SF_MobCapturer1.0.2.jar
+          JAR=build/libs/SF_MobCapturer1.0.3.jar
           test -s "$JAR"
           unzip -p "$JAR" plugin.yml > build/plugin.yml
           grep -Eq '^api-version:[[:space:]]+["'"']?1\.21\.11["'"']?$' build/plugin.yml
           grep -q '^folia-supported: true$' build/plugin.yml
           if grep -q 'GuizhanLibPlugin' build/plugin.yml; then exit 1; fi
           javap -verbose -classpath "$JAR" io.github.thebusybiscuit.mobcapturer.MobCapturer | grep -Fq 'major version: 65'
+          javap -classpath "$JAR" io.github.thebusybiscuit.mobcapturer.adapters.mobs.CopperGolemAdapter >/dev/null
+          javap -classpath "$JAR" io.github.thebusybiscuit.mobcapturer.adapters.mobs.SulfurCubeAdapter >/dev/null
           sha256sum "$JAR"
       - name: Upload raw JAR artifact
         uses: actions/upload-artifact@v7
         with:
-          name: SF_MobCapturer1.0.2.jar
-          path: build/libs/SF_MobCapturer1.0.2.jar
+          name: SF_MobCapturer1.0.3.jar
+          path: build/libs/SF_MobCapturer1.0.3.jar
           archive: false
           if-no-files-found: error
       - name: Publish GitHub release
@@ -126,11 +131,11 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then TAG="$GITHUB_REF_NAME"; else TAG="v1.0.2"; fi
-          JAR=build/libs/SF_MobCapturer1.0.2.jar
-          NOTES="English and compatibility release: restores the authoritative English MobCapturer adapter/lore text, translates the remaining item groups, cannon/pellet/spawn-egg descriptions and research text, removes Gugu-only source helpers, targets Minecraft/Purpur 1.21.11 through Paper/Purpur 26.2 with Java 21 release bytecode, and retains Folia 26.2 validation."
+          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then TAG="$GITHUB_REF_NAME"; else TAG="v1.0.3"; fi
+          JAR=build/libs/SF_MobCapturer1.0.3.jar
+          NOTES="MobCapturer 1.0.3: no GuizhanLibPlugin runtime dependency; authoritative English release text; Java 21 universal bytecode for Minecraft/Purpur 1.21.11 through Paper/Purpur 26.2; Copper Golem support with weathering/state preservation; Sulfur Cube support on 26.2 through runtime-safe discovery with size/wander/fuse preservation; existing Armadillo, Breeze, Bogged, Creaking, Happy Ghast, Nautilus, Zombie Nautilus, Camel Husk and Parched support retained; Folia 26.2 compile validation retained."
           if gh release view "$TAG" >/dev/null 2>&1; then
             gh release upload "$TAG" "$JAR" --clobber
           else
-            gh release create "$TAG" "$JAR" --target "$GITHUB_SHA" --title "SF MobCapturer 1.0.2" --notes "$NOTES"
+            gh release create "$TAG" "$JAR" --target "$GITHUB_SHA" --title "SF MobCapturer 1.0.3" --notes "$NOTES"
           fi

@@ -7,6 +7,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import io.github.thebusybiscuit.mobcapturer.listeners.MobCaptureListener;
 import io.github.thebusybiscuit.mobcapturer.listeners.PelletListener;
+import io.github.thebusybiscuit.mobcapturer.setup.ModernMobSetup;
 import io.github.thebusybiscuit.mobcapturer.setup.Registry;
 import io.github.thebusybiscuit.mobcapturer.setup.Setup;
 import io.github.thebusybiscuit.slimefun4.api.SlimefunAddon;
@@ -47,6 +48,7 @@ public class MobCapturer extends JavaPlugin implements SlimefunAddon {
 
         registry = new Registry(cfg);
         Setup.setup();
+        ModernMobSetup.setup();
 
         new PelletListener(this);
         new MobCaptureListener(this);

@@ -10,8 +10,6 @@ repositories {
     mavenCentral()
     maven("https://repo.papermc.io/repository/maven-public/")
     maven("https://repo.purpurmc.org/snapshots")
-    maven("https://maven.norain.city/releases")
-    maven("https://maven.norain.city/snapshots")
     maven("https://jitpack.io")
 }
 
@@ -33,7 +31,7 @@ dependencies {
     if (slimefunLegacyJar.exists()) {
         compileOnly(files(slimefunLegacyJar))
     } else {
-        compileOnly("com.github.slimefunguguproject:Slimefun4:5c188a3c0a")
+        compileOnly("com.github.Slimefun:Slimefun4:RC-37")
     }
 
     compileOnly("org.projectlombok:lombok:1.18.44")
@@ -44,7 +42,7 @@ dependencies {
 }
 
 group = "io.github.wickidcow"
-version = "1.0.2"
+version = "1.0.3"
 description = "MobCapturer for Slimefun Legacy on Minecraft 1.21.11 through 26.2"
 
 java {
