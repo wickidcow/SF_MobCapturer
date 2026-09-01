@@ -18,6 +18,7 @@ val platform = providers.gradleProperty("platform").orElse("paper").get().lowerc
 val platformVersion = providers.gradleProperty("platformVersion").orElse(
     if (platform == "folia") "26.2.build.+" else "1.21.11-R0.1-SNAPSHOT"
 ).get()
+val releaseJvm = providers.gradleProperty("releaseJvm").orElse("21").get().toInt()
 val platformApi = when (platform) {
     "paper" -> "io.papermc.paper:paper-api:$platformVersion"
     "purpur" -> "org.purpurmc.purpur:purpur-api:$platformVersion"
@@ -47,11 +48,13 @@ description = "MobCapturer for Slimefun Legacy on Minecraft 1.21.11 through 26.2
 
 java {
     toolchain.languageVersion.set(JavaLanguageVersion.of(25))
+    sourceCompatibility = JavaVersion.toVersion(releaseJvm)
+    targetCompatibility = JavaVersion.toVersion(releaseJvm)
 }
 
 tasks.compileJava {
     options.encoding = "UTF-8"
-    options.release.set(21)
+    options.release.set(releaseJvm)
 }
 
 tasks.javadoc {
