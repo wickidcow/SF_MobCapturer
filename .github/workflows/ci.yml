@@ -21,6 +21,12 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+      - name: Checkout authoritative English MobCapturer source
+        uses: actions/checkout@v4
+        with:
+          repository: Slimefun-Addon-Community/MobCapturer
+          ref: master
+          path: .upstream-english
       - name: Checkout Slimefun Legacy 4.1.44
         uses: actions/checkout@v4
         with:
@@ -34,6 +40,14 @@ jobs:
           distribution: temurin
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
+      - name: Restore authoritative English adapter text
+        shell: bash
+        run: |
+          set -euo pipefail
+          cp .upstream-english/src/main/java/io/github/thebusybiscuit/mobcapturer/setup/RecipeTypes.java \
+             src/main/java/io/github/thebusybiscuit/mobcapturer/setup/RecipeTypes.java
+          cp .upstream-english/src/main/java/io/github/thebusybiscuit/mobcapturer/adapters/mobs/*.java \
+             src/main/java/io/github/thebusybiscuit/mobcapturer/adapters/mobs/
       - name: Build Slimefun Legacy API target
         shell: bash
         run: |
@@ -114,7 +128,7 @@ jobs:
           set -euo pipefail
           if [[ "$GITHUB_REF" == refs/tags/v* ]]; then TAG="$GITHUB_REF_NAME"; else TAG="v1.0.2"; fi
           JAR=build/libs/SF_MobCapturer1.0.2.jar
-          NOTES="English and compatibility release: translates the remaining MobCapturer item groups, cannon/pellet/spawn-egg descriptions and research text; removes the Gugu EntityTypeHelper source dependency; targets Minecraft/Purpur 1.21.11 through Paper/Purpur 26.2 with Java 21 bytecode; and retains Folia 26.2 validation."
+          NOTES="English and compatibility release: restores the authoritative English MobCapturer adapter/lore text, translates the remaining item groups, cannon/pellet/spawn-egg descriptions and research text, removes Gugu-only source helpers, targets Minecraft/Purpur 1.21.11 through Paper/Purpur 26.2 with Java 21 release bytecode, and retains Folia 26.2 validation."
           if gh release view "$TAG" >/dev/null 2>&1; then
             gh release upload "$TAG" "$JAR" --clobber
           else
