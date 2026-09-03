@@ -11,7 +11,6 @@ import io.github.thebusybiscuit.mobcapturer.utils.compatibility.FrogVariantX;
 
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Frog;
-import org.bukkit.entity.Frog.Variant;
 
 import net.guizhanss.minecraft.guizhanlib.gugu.minecraft.helpers.entity.FrogHelper;
 
@@ -25,8 +24,9 @@ public class FrogAdapter extends AnimalsAdapter<Frog> {
     @Override
     public List<String> getLore(@Nonnull JsonObject json) {
         List<String> lore = super.getLore(json);
+        String variant = FrogVariantX.normalize(json.get("variant").getAsString());
 
-        lore.add(ChatColor.GRAY + "种类: " + ChatColor.WHITE + FrogHelper.getVariantName(json.get("variant").getAsString()));
+        lore.add(ChatColor.GRAY + "Variant: " + ChatColor.WHITE + FrogHelper.getVariantName(variant));
 
         return lore;
     }
