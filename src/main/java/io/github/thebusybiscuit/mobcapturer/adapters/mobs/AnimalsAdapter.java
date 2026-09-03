@@ -27,7 +27,7 @@ public class AnimalsAdapter<T extends Animals> implements MobAdapter<T> {
     public List<String> getLore(@Nonnull JsonObject json) {
         List<String> lore = MobAdapter.super.getLore(json);
 
-        lore.add(ChatColor.GRAY + "幼年: " + ChatColor.WHITE + BooleanHelper.yesOrNo(json.get("baby").getAsBoolean()));
+        lore.add(ChatColor.GRAY + "Baby: " + ChatColor.WHITE + BooleanHelper.yesOrNo(json.get("baby").getAsBoolean()));
 
         return lore;
     }
