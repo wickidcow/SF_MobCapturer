@@ -25,8 +25,8 @@ public final class FrogVariantX {
     public static void set(Frog entity, String obj) {
         String variant = normalize(obj);
         Object value = ReflectionUtils.valueOf(Frog.Variant.class, variant);
-        if (value != null) {
-            ReflectionUtils.invoke(entity, "setVariant", value);
+        if (value instanceof Frog.Variant frogVariant) {
+            entity.setVariant(frogVariant);
         }
     }
 
