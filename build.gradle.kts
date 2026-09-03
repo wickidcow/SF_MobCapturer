@@ -43,7 +43,7 @@ dependencies {
 }
 
 group = "io.github.wickidcow"
-version = "1.0.3"
+version = "1.0.4"
 description = "MobCapturer for Slimefun Legacy on Minecraft 1.21.11 through 26.2"
 
 java {
