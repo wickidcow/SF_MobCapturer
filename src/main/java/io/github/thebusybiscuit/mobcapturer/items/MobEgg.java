@@ -3,11 +3,18 @@ package io.github.thebusybiscuit.mobcapturer.items;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
+import java.util.HexFormat;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 import com.google.gson.JsonObject;
@@ -78,6 +85,63 @@ public class MobEgg<T extends LivingEntity> extends SimpleSlimefunItem<ItemUseHa
         item.setItemMeta(meta);
 
         return item;
+    }
+
+    /**
+     * Returns a deterministic item-local claim for the captured mob state stored in this egg.
+     * The claim is intentionally a digest rather than the serialized entity payload itself so
+     * Doctor plans do not expose or retain the captured entity data.
+     */
+    public @Nullable String getPresentationClaim(@Nonnull ItemStack item) {
+        JsonObject json = getCapturedData(item);
+        if (json == null) {
+            return null;
+        }
+
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hash = digest.digest(json.toString().getBytes(StandardCharsets.UTF_8));
+            return HexFormat.of().formatHex(hash);
+        } catch (NoSuchAlgorithmException exception) {
+            throw new IllegalStateException("SHA-256 is unavailable", exception);
+        }
+    }
+
+    /**
+     * Rebuilds only the visible presentation of a captured mob egg from its existing PDC data.
+     * Captured entity data, captured inventory data, Slimefun identity and stack amount remain
+     * untouched.
+     */
+    public boolean refreshPresentation(@Nonnull ItemStack item) {
+        JsonObject json = getCapturedData(item);
+        if (json == null) {
+            return false;
+        }
+
+        ItemMeta meta = item.getItemMeta();
+        ItemMeta canonicalMeta = getItem().getItemMeta();
+        String currentName = meta.hasDisplayName() ? meta.getDisplayName() : null;
+        String canonicalName = canonicalMeta.hasDisplayName() ? canonicalMeta.getDisplayName() : null;
+        List<String> currentLore = meta.hasLore() ? meta.getLore() : null;
+        List<String> regeneratedLore = adapter.getLore(json);
+
+        boolean nameChanged = canonicalName != null && !Objects.equals(currentName, canonicalName);
+        boolean loreChanged = !Objects.equals(currentLore, regeneratedLore);
+        if (!nameChanged && !loreChanged) {
+            return false;
+        }
+
+        if (nameChanged) {
+            meta.setDisplayName(canonicalName);
+        }
+        meta.setLore(regeneratedLore);
+        item.setItemMeta(meta);
+        return true;
+    }
+
+    private @Nullable JsonObject getCapturedData(@Nonnull ItemStack item) {
+        ItemMeta meta = item.getItemMeta();
+        return meta.getPersistentDataContainer().get(Keys.DATA, adapter);
     }
 
     @Nonnull
