@@ -24,8 +24,8 @@ public class PandaAdapter extends AnimalsAdapter<Panda> {
     public List<String> getLore(@Nonnull JsonObject json) {
         List<String> lore = super.getLore(json);
 
-        lore.add(ChatColor.GRAY + "主要基因: " + ChatColor.WHITE + PandaHelper.getGeneName(json.get("mainGene").getAsString()));
-        lore.add(ChatColor.GRAY + "隐藏基因: " + ChatColor.WHITE + PandaHelper.getGeneName(json.get("hiddenGene").getAsString()));
+        lore.add(ChatColor.GRAY + "Main Gene: " + ChatColor.WHITE + PandaHelper.getGeneName(json.get("mainGene").getAsString()));
+        lore.add(ChatColor.GRAY + "Hidden Gene: " + ChatColor.WHITE + PandaHelper.getGeneName(json.get("hiddenGene").getAsString()));
 
         return lore;
     }
