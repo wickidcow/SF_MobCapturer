@@ -1,6 +1,7 @@
 package io.github.thebusybiscuit.mobcapturer.adapters.mobs;
 
 import java.util.List;
+import java.util.Locale;
 
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -10,8 +11,6 @@ import com.google.gson.JsonObject;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Panda;
 import org.bukkit.entity.Panda.Gene;
-
-import net.guizhanss.minecraft.guizhanlib.gugu.minecraft.helpers.entity.PandaHelper;
 
 public class PandaAdapter extends AnimalsAdapter<Panda> {
 
@@ -24,10 +23,15 @@ public class PandaAdapter extends AnimalsAdapter<Panda> {
     public List<String> getLore(@Nonnull JsonObject json) {
         List<String> lore = super.getLore(json);
 
-        lore.add(ChatColor.GRAY + "主要基因: " + ChatColor.WHITE + PandaHelper.getGeneName(json.get("mainGene").getAsString()));
-        lore.add(ChatColor.GRAY + "隐藏基因: " + ChatColor.WHITE + PandaHelper.getGeneName(json.get("hiddenGene").getAsString()));
+        lore.add(ChatColor.GRAY + "Main Gene: " + ChatColor.WHITE + friendlyGeneName(json.get("mainGene").getAsString()));
+        lore.add(ChatColor.GRAY + "Hidden Gene: " + ChatColor.WHITE + friendlyGeneName(json.get("hiddenGene").getAsString()));
 
         return lore;
+    }
+
+    private String friendlyGeneName(@Nonnull String geneName) {
+        String lower = geneName.toLowerCase(Locale.ROOT);
+        return Character.toUpperCase(lower.charAt(0)) + lower.substring(1);
     }
 
     @Override
