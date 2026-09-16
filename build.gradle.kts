@@ -38,12 +38,11 @@ dependencies {
     compileOnly("org.projectlombok:lombok:1.18.44")
     annotationProcessor("org.projectlombok:lombok:1.18.44")
 
-    implementation("org.bstats:bstats-bukkit:3.1.0")
     implementation("com.google.code.findbugs:jsr305:3.0.2")
 }
 
 group = "io.github.wickidcow"
-version = "1.0.5"
+version = "1.0.6"
 description = "MobCapturer for Slimefun Legacy on Minecraft 1.21.11 through 26.3"
 
 java {
@@ -72,7 +71,6 @@ tasks.shadowJar {
         relocate(from, "io.github.thebusybiscuit.mobcapturer.libs.$last")
     }
 
-    doRelocate("org.bstats")
     doRelocate("javax.annotation")
 
     archiveClassifier.set("")

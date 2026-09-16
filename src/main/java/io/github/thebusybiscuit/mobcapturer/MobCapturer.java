@@ -2,7 +2,6 @@ package io.github.thebusybiscuit.mobcapturer;
 
 import javax.annotation.Nonnull;
 
-import org.bstats.bukkit.Metrics;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import io.github.thebusybiscuit.mobcapturer.diagnostics.LegacyDoctorBridge;
@@ -45,7 +44,6 @@ public class MobCapturer extends JavaPlugin implements SlimefunAddon {
         setInstance(this);
 
         Config cfg = new Config(this);
-        new Metrics(this, 6672);
 
         registry = new Registry(cfg);
         Setup.setup();

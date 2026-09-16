@@ -1,23 +1,20 @@
-# SF MobCapturer 1.0.1
+# SF MobCapturer 1.0.6
 
-Compatibility and safety update for the Slimefun Legacy edition of MobCapturer.
+Boot-compatibility fix for the Slimefun Legacy edition of MobCapturer.
 
 ## Highlights
 
-- Hard-blocks capture of **EliteMobs** elite entities, NPCs, and super mobs.
-- Hard-blocks capture of active **MythicMobs** entities.
-- Uses owning-plugin API checks with persistent-data and metadata safeguards.
-- Fails closed if an enabled EliteMobs or MythicMobs integration cannot reliably identify managed mobs, preventing accidental conversion or duplication.
-- Adds Folia-aware plugin metadata and removes legacy Bukkit scheduler assumptions from the supported capture/release paths.
-- Updates bStats to the Folia-capable 3.1.x line.
-- Removes the GuizhanLibPlugin runtime requirement and keeps the addon self-contained for its inherited compatibility helpers.
-- Adds CI compilation gates for **Paper 26.2**, **Purpur 26.2**, and **Folia 26.2** APIs.
-- Retains the Paper 26.2 attribute compatibility and Dev-37 captured-egg recovery introduced in 1.0.0.
-- Replaces the inherited README with current Slimefun Legacy-focused installation, compatibility, safety, and credit information.
-- Release asset is provided directly as `SF_MobCapturer1.0.1.jar`.
+- Fixes the Paper 26.2 startup failure caused by an incompatible bStats `Metrics` constructor being linked at runtime.
+- Removes MobCapturer's optional bStats startup dependency so another plugin's or library's bundled bStats classes cannot prevent the addon from enabling.
+- Keeps the universal release baseline at **Minecraft 1.21.11 / Java 21 bytecode** while continuing compile validation against **Paper 26.2**, **Purpur 26.2**, **Paper 26.3**, and **Folia 26.2**.
+- Uses **Slimefun Legacy 4.1.50** as the CI API target.
+- Keeps Purpur 26.3 validation availability-aware until a matching Purpur API artifact is published.
+- Adds release-artifact checks that fail CI if bStats classes or references are accidentally reintroduced.
+- Retains the EliteMobs/MythicMobs capture protections, modern mob support, Folia metadata, and English compatibility fixes from earlier releases.
+- Release asset is provided directly as `SF_MobCapturer1.0.6.jar`.
 
 ## Upgrade
 
-Stop the server, replace the previous MobCapturer JAR with `SF_MobCapturer1.0.1.jar`, and start the server normally. Do not use `/reload`.
+Stop the server, remove `SF_MobCapturer1.0.5.jar`, install `SF_MobCapturer1.0.6.jar`, and start the server normally. Do not use `/reload`.
 
-Existing captured mobs remain compatible. EliteMobs and MythicMobs are optional integrations; when installed, their managed entities are rejected before MobCapturer creates an egg or removes the entity.
+Existing captured mobs and MobCapturer configuration remain compatible; this release changes startup packaging only and does not alter capture data formats.
