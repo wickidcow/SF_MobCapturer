@@ -89,7 +89,7 @@ jobs:
             echo 'External GuizhanLib dependency remains in the build.' >&2
             exit 1
           fi
-          grep -Fq 'version = "1.0.4"' build.gradle.kts
+          grep -Fq 'version = "1.0.5"' build.gradle.kts
           grep -Fq 'apiVersion = "1.21.11"' build.gradle.kts
           grep -Fq 'releaseJvm = providers.gradleProperty("releaseJvm").orElse("21")' build.gradle.kts
           grep -Fq 'options.release.set(releaseJvm)' build.gradle.kts
@@ -108,6 +108,10 @@ jobs:
         run: ./gradlew clean compileJava -Pplatform=paper -PplatformVersion=26.2.build.+ -PreleaseJvm=25 --stacktrace --no-daemon
       - name: Verify Purpur 26.2 compilation
         run: ./gradlew clean compileJava -Pplatform=purpur -PplatformVersion=26.2.build.+ -PreleaseJvm=25 --stacktrace --no-daemon
+      - name: Verify Paper 26.3 compilation
+        run: ./gradlew clean compileJava -Pplatform=paper -PplatformVersion=26.3.build.+ -PreleaseJvm=25 --stacktrace --no-daemon
+      - name: Verify Purpur 26.3 compilation
+        run: ./gradlew clean compileJava -Pplatform=purpur -PplatformVersion=26.3.build.+ -PreleaseJvm=25 --stacktrace --no-daemon
       - name: Verify Folia 26.2 compilation
         run: ./gradlew clean compileJava -Pplatform=folia -PplatformVersion=26.2.build.+ -PreleaseJvm=25 --stacktrace --no-daemon
       - name: Build universal release JAR from 1.21.11 baseline
@@ -116,7 +120,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          JAR=build/libs/SF_MobCapturer1.0.4.jar
+          JAR=build/libs/SF_MobCapturer1.0.5.jar
           test -s "$JAR"
           unzip -p "$JAR" plugin.yml > build/plugin.yml
           grep -Eq '^api-version:.*1\.21\.11' build/plugin.yml
@@ -129,8 +133,8 @@ jobs:
       - name: Upload raw JAR artifact
         uses: actions/upload-artifact@v7
         with:
-          name: SF_MobCapturer1.0.4.jar
-          path: build/libs/SF_MobCapturer1.0.4.jar
+          name: SF_MobCapturer1.0.5.jar
+          path: build/libs/SF_MobCapturer1.0.5.jar
           archive: false
           if-no-files-found: error
       - name: Publish GitHub release
@@ -140,11 +144,11 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then TAG="$GITHUB_REF_NAME"; else TAG="v1.0.4"; fi
-          JAR=build/libs/SF_MobCapturer1.0.4.jar
-          NOTES="MobCapturer 1.0.4: fixes captured animal/frog lore still showing Chinese, keeps frog descriptions short by storing a stable WARM/COLD/TEMPERATE variant key on modern Paper, and retains the 1.21.11 through 26.2 compatibility and modern mob support from 1.0.3."
+          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then TAG="$GITHUB_REF_NAME"; else TAG="v1.0.5"; fi
+          JAR=build/libs/SF_MobCapturer1.0.5.jar
+          NOTES="MobCapturer 1.0.5 adds Paper and Purpur 26.3 compatibility validation while retaining the universal 1.21.11 baseline, Paper/Purpur 26.2 primary support, Folia secondary compatibility, modern mob support, and the English/frog-lore fixes from 1.0.4."
           if gh release view "$TAG" >/dev/null 2>&1; then
             gh release upload "$TAG" "$JAR" --clobber
           else
-            gh release create "$TAG" "$JAR" --target "$GITHUB_SHA" --title "SF MobCapturer 1.0.4" --notes "$NOTES"
+            gh release create "$TAG" "$JAR" --target "$GITHUB_SHA" --title "SF MobCapturer 1.0.5" --notes "$NOTES"
           fi
