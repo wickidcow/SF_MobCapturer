@@ -43,8 +43,8 @@ dependencies {
 }
 
 group = "io.github.wickidcow"
-version = "1.0.4"
-description = "MobCapturer for Slimefun Legacy on Minecraft 1.21.11 through 26.2"
+version = "1.0.5"
+description = "MobCapturer for Slimefun Legacy on Minecraft 1.21.11 through 26.3"
 
 java {
     toolchain.languageVersion.set(JavaLanguageVersion.of(25))
