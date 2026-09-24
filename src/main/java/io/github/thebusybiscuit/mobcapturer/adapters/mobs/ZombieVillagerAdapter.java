@@ -11,7 +11,6 @@ import com.google.gson.JsonObject;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.entity.Villager.Profession;
 import org.bukkit.entity.ZombieVillager;
 
 import io.github.thebusybiscuit.mobcapturer.utils.compatibility.VillagerProfessionX;
@@ -28,7 +27,7 @@ public class ZombieVillagerAdapter extends ZombieAdapter<ZombieVillager> {
     public List<String> getLore(@Nonnull JsonObject json) {
         List<String> lore = super.getLore(json);
 
-        lore.add(ChatColor.GRAY + "职业: " + ChatColor.WHITE + VillagerHelper.getProfessionName(Profession.valueOf(json.get("profession").getAsString())));
+        lore.add(ChatColor.GRAY + "职业: " + ChatColor.WHITE + VillagerHelper.getProfessionName(VillagerProfessionX.fromString(json.get("profession").getAsString())));
 
         return lore;
     }
