@@ -21,6 +21,7 @@ import io.github.thebusybiscuit.mobcapturer.MobCapturer;
 import io.github.thebusybiscuit.mobcapturer.events.MobCaptureEvent;
 import io.github.thebusybiscuit.mobcapturer.items.MobEgg;
 import io.github.thebusybiscuit.mobcapturer.setup.Keys;
+import io.github.thebusybiscuit.slimefun4.implementation.Slimefun;
 import io.github.thebusybiscuit.slimefun4.libraries.dough.config.Config;
 
 /**
@@ -51,9 +52,10 @@ public class PelletListener implements Listener {
             Optional<ItemStack> optional = capture(entity);
 
             if (optional.isPresent()) {
+                Location capturedLocation = entity.getLocation().clone();
                 pellet.removeMetadata(Keys.MOB_CAPTURING_PELLET, plugin);
                 entity.remove();
-                dropEgg(player, optional.get(), entity.getLocation());
+                dropEgg(player, optional.get(), capturedLocation);
             }
         }
     }
@@ -110,15 +112,43 @@ public class PelletListener implements Listener {
     @ParametersAreNonnullByDefault
     protected void dropEgg(Player p, ItemStack item, Location loc) {
         Config config = MobCapturer.getRegistry().getConfig();
-        if (config.getBoolean("options.mob-eggs-to-inventory")) {
+        if (!config.getBoolean("options.mob-eggs-to-inventory")) {
+            dropAt(loc, item);
+            return;
+        }
+
+        Runnable delivery = () -> {
             Map<Integer, ItemStack> remainingItems = p.getInventory().addItem(item);
             if (!remainingItems.isEmpty()) {
+                Location playerLocation = p.getLocation();
                 for (ItemStack remainingItem : remainingItems.values()) {
-                    p.getWorld().dropItemNaturally(p.getLocation(), remainingItem);
+                    p.getWorld().dropItemNaturally(playerLocation, remainingItem);
                 }
             }
+        };
+
+        if (Slimefun.getSchedulerService().isOwnedByCurrentRegion(p)) {
+            delivery.run();
         } else {
-            loc.getWorld().dropItemNaturally(loc, item);
+            // ProjectileHitEvent is owned by the hit/projectile region on Folia.
+            // The shooter can already be in another region, so inventory access
+            // must be handed to the player's entity scheduler. If the player
+            // retires before delivery, preserve the captured egg at the hit region.
+            Slimefun.getSchedulerService().runFor(
+                p,
+                delivery,
+                () -> dropAt(loc, item)
+            );
+        }
+    }
+
+    @ParametersAreNonnullByDefault
+    private void dropAt(Location location, ItemStack item) {
+        Runnable drop = () -> location.getWorld().dropItemNaturally(location, item);
+        if (Slimefun.getSchedulerService().isOwnedByCurrentRegion(location)) {
+            drop.run();
+        } else {
+            Slimefun.getSchedulerService().runAt(location, drop);
         }
     }
 }
