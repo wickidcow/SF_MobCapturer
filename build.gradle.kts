@@ -31,6 +31,7 @@ dependencies {
 
     if (slimefunLegacyJar.exists()) {
         compileOnly(files(slimefunLegacyJar))
+        testImplementation(files(slimefunLegacyJar))
     } else {
         compileOnly("com.github.Slimefun:Slimefun4:RC-37")
     }
@@ -39,10 +40,14 @@ dependencies {
     annotationProcessor("org.projectlombok:lombok:1.18.44")
 
     implementation("com.google.code.findbugs:jsr305:3.0.2")
+
+    testImplementation(platform("org.junit:junit-bom:6.0.3"))
+    testImplementation("org.junit.jupiter:junit-jupiter")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
 group = "io.github.wickidcow"
-version = "1.0.6"
+version = "1.0.7"
 description = "MobCapturer for Slimefun Legacy on Minecraft 1.21.11 through 26.3"
 
 java {
@@ -58,6 +63,10 @@ tasks.compileJava {
 
 tasks.javadoc {
     options.encoding = "UTF-8"
+}
+
+tasks.test {
+    useJUnitPlatform()
 }
 
 tasks.withType<AbstractArchiveTask>().configureEach {
