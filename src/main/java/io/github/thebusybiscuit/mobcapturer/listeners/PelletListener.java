@@ -134,8 +134,8 @@ public class PelletListener implements Listener {
             // The shooter can already be in another region, so inventory access
             // must be handed to the player's entity scheduler. If the player
             // retires before delivery, preserve the captured egg at the hit region.
-            Slimefun.getSchedulerService().runFor(
-                p,
+            CapturedEggDelivery.schedule(
+                (deliver, retired) -> Slimefun.getSchedulerService().runFor(p, deliver, retired),
                 delivery,
                 () -> dropAt(loc, item)
             );

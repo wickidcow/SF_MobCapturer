@@ -53,7 +53,7 @@ There is no player bypass for these protections.
 
 | Requirement | Supported setup |
 | --- | --- |
-| **Slimefun core** | Slimefun Legacy 4.1.37+ |
+| **Slimefun core** | Slimefun Legacy 4.1.75+; 4.1.75 is the verified release target |
 | **Primary server** | Paper 26.2 |
 | **Secondary server** | Purpur based on Paper 26.2 |
 | **Folia** | Folia-aware; Slimefun Legacy's Folia support remains experimental |
@@ -116,7 +116,9 @@ minecraft:fall_damage_multiplier
 
 SF MobCapturer's capture and release paths operate from entity/player-owned event contexts and do not schedule delayed world or entity mutations through Bukkit's global scheduler.
 
-The fork also uses a Folia-capable bStats release and declares Folia support in its plugin metadata. The addon itself is kept region-local; however, **every plugin in a Folia server's stack must also be Folia-safe**. Slimefun Legacy currently treats Folia support as experimental, so production Folia deployments should be validated on a staging server first.
+Version 1.0.7 delivers captured eggs on the player's region. If the player disconnects before delivery, the egg is dropped on the captured mob's region. A shared delivery guard prevents the inventory and fallback paths from both delivering the same egg, including when older scheduler implementations reject an already-retired player without invoking the callback.
+
+The fork has no bStats runtime dependency and declares Folia support in its plugin metadata. Focused tests cover scheduled delivery and player retirement; Paper, Purpur and Folia API compilation checks do not replace live gameplay validation. Slimefun Legacy currently treats Folia support as experimental, so production Folia deployments should be validated on a staging server first.
 
 ---
 
@@ -125,7 +127,7 @@ The fork also uses a Folia-capable bStats release and declares Folia support in 
 SF MobCapturer is built with Gradle.
 
 ```text
-./gradlew clean shadowJar
+./gradlew clean test shadowJar
 ```
 
 Release CI compiles against the exact Slimefun Legacy release target and outputs a raw JAR under:
