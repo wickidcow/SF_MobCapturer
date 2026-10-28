@@ -32,12 +32,18 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-      - name: Checkout authoritative English MobCapturer source
-        uses: actions/checkout@v4
+      - name: Checkout checksum-pinned authoritative English MobCapturer source
+        uses: actions/checkout@v6
         with:
           repository: Slimefun-Addon-Community/MobCapturer
-          ref: master
+          ref: b418c2dedd5c582a38821f961616fca7fc6de665
           path: .upstream-english
+          persist-credentials: false
+      - name: Verify pinned English upstream identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git -C .upstream-english rev-parse HEAD)" =             b418c2dedd5c582a38821f961616fca7fc6de665
       - name: Checkout released Slimefun Legacy 4.1.75 core
         uses: actions/checkout@v6
         with:
@@ -184,19 +190,55 @@ jobs:
           if-no-files-found: error
 
 
+  artifact_roundtrip:
+    name: Verify raw MobCapturer 1.0.7 JAR transfer
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Download exactly the same-run uncompressed release artifact
+        uses: actions/download-artifact@v8
+        with:
+          name: SF_MobCapturer1.0.7.jar
+          path: dist
+          skip-decompress: true
+      - name: Reject missing, compressed or invalid release payloads
+        shell: bash
+        run: |
+          set -euo pipefail
+          JAR=dist/SF_MobCapturer1.0.7.jar
+          test -s "$JAR"
+          unzip -tqq "$JAR"
+          python3 - <<'PY'
+          import re
+          from zipfile import ZipFile
+          with ZipFile('dist/SF_MobCapturer1.0.7.jar') as jar:
+              plugin=jar.read('plugin.yml').decode('utf-8')
+          version=re.search(r'(?m)^version:\s*["\x27]?([^"\x27\s]+)',plugin)
+          assert version and version.group(1)=='1.0.7', 'Wrong plugin version'
+          assert re.search(r'(?m)^api-version:\s*["\x27]?1\.21\.11',plugin)
+          PY
+          sha256sum "$JAR"
+
   publish:
     name: Publish validated immutable MobCapturer release
-    needs: build
-    if: github.event_name == 'workflow_dispatch' && inputs.publish == true
+    needs: [build, artifact_roundtrip]
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/master' && inputs.publish == true
     runs-on: ubuntu-latest
     permissions:
       contents: write
     steps:
-      - name: Download validated JAR
-        uses: actions/download-artifact@v6
+      - name: Check out reviewed source for immutable release identity
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - name: Download same-run raw validated JAR, not an artifact ZIP
+        uses: actions/download-artifact@v8
         with:
           name: SF_MobCapturer1.0.7.jar
           path: dist
+          skip-decompress: true
 
       - name: Validate explicit publication request
         id: release
@@ -206,12 +248,21 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          test "$GITHUB_REF" = 'refs/heads/master'
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          CURRENT_MASTER="$(gh api "repos/$GITHUB_REPOSITORY/git/ref/heads/master" --jq .object.sha)"
+          test "$CURRENT_MASTER" = "$GITHUB_SHA" || {
+            echo 'Refusing publication from a stale master commit.' >&2
+            exit 1
+          }
+          grep -Fq 'version = "1.0.7"' build.gradle.kts
           test "$CONFIRM_VERSION" = "1.0.7" || {
             echo 'Refusing publication: confirm_version must be exactly 1.0.7.' >&2
             exit 1
           }
           JAR=dist/SF_MobCapturer1.0.7.jar
           test -s "$JAR"
+          unzip -tqq "$JAR"
           TAG=v1.0.7
           if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo "Refusing publication: release $TAG already exists." >&2
@@ -234,3 +285,28 @@ jobs:
           gh release create "$TAG" "$JAR" --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
             --title "SF MobCapturer 1.0.7" \
             --notes "MobCapturer 1.0.7 delivers captured eggs on the player region and preserves them at the capture location if the player disconnects. Exactly-once delivery handles immediate and later retirement on released Slimefun Legacy 4.1.75. Includes focused regression tests and Paper/Purpur/Folia compilation checks; the universal JAR targets Java 21 and Minecraft 1.21.11+."
+
+      - name: Verify release asset metadata and byte-identical download
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh api "repos/$GITHUB_REPOSITORY/releases/tags/v1.0.7" > "$RUNNER_TEMP/mobcapturer-release.json"
+          python3 - <<'PY'
+          import hashlib,json,os
+          from pathlib import Path
+          release=json.loads((Path(os.environ['RUNNER_TEMP'])/'mobcapturer-release.json').read_text())
+          jar=Path('dist/SF_MobCapturer1.0.7.jar')
+          assert release['tag_name']=='v1.0.7'
+          assert release['target_commitish']==os.environ['GITHUB_SHA']
+          assert len(release['assets'])==1
+          asset=release['assets'][0]
+          assert asset['name']==jar.name and asset['state']=='uploaded'
+          assert asset['size']==jar.stat().st_size
+          assert asset['digest']=='sha256:'+hashlib.sha256(jar.read_bytes()).hexdigest()
+          PY
+          mkdir -p verify-download
+          gh release download v1.0.7 --repo "$GITHUB_REPOSITORY" \
+            --pattern SF_MobCapturer1.0.7.jar --dir verify-download
+          cmp dist/SF_MobCapturer1.0.7.jar verify-download/SF_MobCapturer1.0.7.jar
