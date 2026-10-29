@@ -25,7 +25,7 @@ def verify(jar_path: Path) -> int:
                 continue
 
             header = jar.read(entry)[:8]
-            if len(header) != 8 or header[:4] != b"\\xca\\xfe\\xba\\xbe":
+            if len(header) != 8 or header[:4] != bytes.fromhex("cafebabe"):
                 raise ValueError(f"Invalid class header: {name}")
             major = int.from_bytes(header[6:8], byteorder="big")
             if major > MAX_CLASS_MAJOR:
