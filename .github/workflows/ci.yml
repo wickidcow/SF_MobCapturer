@@ -29,6 +29,8 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    outputs:
+      raw_jar_sha256: ${{ steps.raw_jar_sha256.outputs.sha256 }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -164,6 +166,7 @@ jobs:
         run: |
           set -euo pipefail
           python3 -m unittest discover -s scripts -p 'test_verify_release_bytecode.py' -v
+          python3 -m unittest discover -s scripts -p 'test_verify_raw_jar_digest.py' -v
           python3 scripts/verify_release_bytecode.py build/libs/SF_MobCapturer1.0.7.jar
       - name: Verify release artifact
         shell: bash
@@ -187,6 +190,15 @@ jobs:
           javap -classpath "$JAR" io.github.thebusybiscuit.mobcapturer.adapters.mobs.CopperGolemAdapter >/dev/null
           javap -classpath "$JAR" io.github.thebusybiscuit.mobcapturer.adapters.mobs.SulfurCubeAdapter >/dev/null
           sha256sum "$JAR"
+      - name: Record original raw JAR SHA-256 for cross-job verification
+        id: raw_jar_sha256
+        shell: bash
+        run: |
+          set -euo pipefail
+          JAR=build/libs/SF_MobCapturer1.0.7.jar
+          test -s "$JAR"
+          SHA="$(sha256sum "$JAR" | awk '{print $1}')"
+          echo "sha256=$SHA" >> "$GITHUB_OUTPUT"
       - name: Upload raw JAR artifact
         uses: actions/upload-artifact@v7
         with:
@@ -203,6 +215,10 @@ jobs:
     permissions:
       contents: read
     steps:
+      - name: Check out exact source for transfer verification
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
       - name: Download exactly the same-run uncompressed release artifact
         uses: actions/download-artifact@v8
         with:
@@ -211,11 +227,14 @@ jobs:
           skip-decompress: true
       - name: Reject missing, compressed or invalid release payloads
         shell: bash
+        env:
+          ORIGINAL_RAW_JAR_SHA256: ${{ needs.build.outputs.raw_jar_sha256 }}
         run: |
           set -euo pipefail
           JAR=dist/SF_MobCapturer1.0.7.jar
           test -s "$JAR"
           unzip -tqq "$JAR"
+          python3 scripts/verify_raw_jar_digest.py "$JAR" "$ORIGINAL_RAW_JAR_SHA256"
           python3 - <<'PY'
           import re
           from zipfile import ZipFile
