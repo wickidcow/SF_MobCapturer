@@ -1,5 +1,7 @@
 """Regression coverage for the Java 21 distributable-class ceiling."""
 
+import hashlib
+
 from pathlib import Path
 import tempfile
 import unittest
@@ -9,8 +11,8 @@ from zipfile import ZipFile
 from verify_release_bytecode import MAIN_CLASS, verify
 
 
-def class_header(major: int) -> bytes:
-    return bytes.fromhex("cafebabe0000") + major.to_bytes(2, "big")
+def class_header(major: int, minor: int = 0) -> bytes:
+    return bytes.fromhex("cafebabe") + minor.to_bytes(2, "big") + major.to_bytes(2, "big")
 
 
 class ReleaseBytecodeTest(unittest.TestCase):
@@ -48,6 +50,42 @@ class ReleaseBytecodeTest(unittest.TestCase):
         self.write(duplicate=True)
         with self.assertRaisesRegex(ValueError, "Duplicate JAR entry"):
             verify(self.jar)
+
+    def test_rejects_java21_preview_entrypoint(self):
+        self.write(main=class_header(65, 65535))
+        with self.assertRaisesRegex(ValueError, r"preview class 65\.65535"):
+            verify(self.jar)
+
+    def test_rejects_preview_in_older_or_shaded_classes(self):
+        for major in (56, 61, 64):
+            with self.subTest(major=major):
+                self.write(other=(("shade/Preview.class", class_header(major, 65535)),))
+                with self.assertRaisesRegex(ValueError, "preview class"):
+                    verify(self.jar)
+
+    def test_rejects_invalid_modern_minor_versions(self):
+        for major, minor in ((56, 1), (61, 42), (65, 65534)):
+            with self.subTest(major=major, minor=minor):
+                self.write(main=class_header(major, minor))
+                with self.assertRaisesRegex(ValueError, "invalid minor class"):
+                    verify(self.jar)
+
+    def test_accepts_historical_nonzero_minors(self):
+        for major, minor in ((45, 3), (52, 1), (55, 65535)):
+            with self.subTest(major=major, minor=minor):
+                self.write(other=(("shade/Old.class", class_header(major, minor)),))
+                self.assertEqual(2, verify(self.jar))
+
+    def test_rejects_major_below_supported_jvm_floor(self):
+        self.write(main=class_header(44))
+        with self.assertRaisesRegex(ValueError, "Invalid Java class major"):
+            verify(self.jar)
+
+    def test_all_classes_checked_without_jar_mutation(self):
+        self.write(other=(("shade/Old.class", class_header(52)),))
+        before = hashlib.sha256(self.jar.read_bytes()).hexdigest()
+        self.assertEqual(2, verify(self.jar))
+        self.assertEqual(before, hashlib.sha256(self.jar.read_bytes()).hexdigest())
 
     def test_requires_plugin_manifest(self):
         self.write(include_plugin=False)

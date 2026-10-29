@@ -27,9 +27,18 @@ def verify(jar_path: Path) -> int:
             header = jar.read(entry)[:8]
             if len(header) != 8 or header[:4] != bytes.fromhex("cafebabe"):
                 raise ValueError(f"Invalid class header: {name}")
+            minor = int.from_bytes(header[4:6], byteorder="big")
             major = int.from_bytes(header[6:8], byteorder="big")
             if major > MAX_CLASS_MAJOR:
                 raise ValueError(f"Java {major} class version exceeds Java 21 ({MAX_CLASS_MAJOR}): {name}")
+            if major < 45:
+                raise ValueError(f"Invalid Java class major {major}.{minor}: {name}")
+            # JVMS 4.1: majors 56 and newer permit minor 0 for stable
+            # bytecode. Minor 65535 is release-specific preview, which cannot
+            # ship in a stable Java 21 plugin requiring no --enable-preview.
+            if major >= 56 and minor != 0:
+                kind = "preview" if minor == 65535 else "invalid minor"
+                raise ValueError(f"Non-distributable {kind} class {major}.{minor}: {name}")
             checked += 1
 
     if MAIN_CLASS not in seen or "plugin.yml" not in seen:
