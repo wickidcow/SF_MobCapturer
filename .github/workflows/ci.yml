@@ -159,6 +159,12 @@ jobs:
           name: captured-egg-delivery-test-evidence
           path: build/test-results/test/TEST-*.xml
           if-no-files-found: warn
+      - name: Verify all shaded classes target Java 21 or earlier
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m unittest discover -s scripts -p 'test_verify_release_bytecode.py' -v
+          python3 scripts/verify_release_bytecode.py build/libs/SF_MobCapturer1.0.7.jar
       - name: Verify release artifact
         shell: bash
         run: |
